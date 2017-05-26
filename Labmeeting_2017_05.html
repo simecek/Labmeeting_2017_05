@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>My Last Day at JAX</title>
+    <meta charset="utf-8">
+    <meta name="author" content="Petr Simecek" />
+    <link href="libs/remark-css/example.css" rel="stylesheet" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# My Last Day at JAX
+## From FASTQ files to QTL Viewer
+### Petr Simecek
+### 2017/05/26
+
+---
+
+
+
+
+background-image: url(https://c1.staticflickr.com/4/3013/2691957118_93e29ab395_b.jpg)
+
+???
+
+It all started on Mouse Genetics conference...
+
+---
+
+background-image: url(http://www.mousegenetics2011.org/images/mouse_01.png)
+
+???
+
+It all started on Mouse Genetics conference...
+
+---
+
+background-image: url(trump.jpg)
+
+???
+
+Let us strarts from raw data...
+
+---
+
+# Preprocessing (from /data/gac/raw/...)
+
+&lt;tt&gt;/data/cgd/pipeline_emase/scripts&lt;/tt&gt;
+
+   - shell script: bowtie + EMASE + GBRS
+   - R script: add annotation, filtering, normalization, rankZ
+   
+
+```r
+lods &lt;- function(expr, prob, id, X) {
+  results &lt;- rep(0,ncol(expr))
+  for(i in which(!is.na(id))) {
+    y &lt;- expr[,i] # expression of one gene/protein
+    sel &lt;- !is.na(y)
+    rss1 &lt;- sum(lsfit(y=y[sel], x=cbind(X[sel,],prob[sel,-1,id[i]]), intercept=FALSE)$residuals^2)
+    rss0 &lt;- sum(lsfit(y=y[sel], x=X[sel,], intercept=FALSE)$residuals^2)
+    results[i] &lt;- sum(sel)/2 * (log10(rss0) - log10(rss1))
+  }
+  results
+}
+
+tmp &lt;- lods(expr.mrna, genoprobs, annot.mrna$nearest_snp, covar)
+qgrid &lt;- seq(from=0.50, to=0.95, length=10)
+plot(x=qgrid, y=quantile(tmp, qgrid, na.rm=TRUE), xlab="Quantile", ylab="LOD",
+     type="b", ylim=c(0,100))
+```
+
+
+---
+
+background-image: url(datalake.jpg)
+
+???
+
+So now we have the data
+
+
+---
+
+# Data analysis
+
+&lt;tt&gt;/data/cgd/QTL_mapping&lt;/tt&gt;
+
+- ANOVA tests (males vs. females)
+- QTL mapping
+- mediation
+- heritability
+- modules
+
+---
+
+background-image: url(paralel_computing.jpg)
+
+???
+
+So now we have the data
+
+---
+
+# Viewers:
+
+- DOQTL analyses and R/Shiny viewers:
+
+  - [heart](http://churchilldev.jax.org:49194/heart/) 
+  - [kidney](http://churchilldev.jax.org:49194/kidney/) 
+  - [islet](http://churchilldev.jax.org:49194/islet/)
+  - [bones](http://churchilldev.jax.org:49194/bone/)
+  - ...
+  - [others](http://churchill-lab.jax.org/website/shinytools)
+
+- The Aging Proteome [workflowr](http://simecek.xyz/TheAgingProteome/)
+
+???
+
+---
+
+background-image: url(linear_regression.png)
+
+???
+
+Do we believe in our results?
+
+---
+
+# Projects
+
+- Attie DO
+- Pack DO (+ microbiome)
+- Intermediate R package
+- MDA (+paper)
+- CGD DO (kidney, heart liver, bone + phenotypes)
+- qtl2 R package
+- shiny / R API for QTL viewer
+- machine learning (QTL Archive paper)
+
+---
+
+background-image: url(laws_of_physics.png)
+
+???
+
+Do we believe in our results?
+
+---
+
+# Future
+
+- [Nate Silver: The Signal and the Noise: Why So Many Predictions Fail](https://www.amazon.com/Signal-Noise-Many-Predictions-Fail-but/dp/0143125087)
+- [Michael Lewis: The Undoing Project](https://www.amazon.com/Undoing-Project-Friendship-Changed-Minds-ebook/dp/B01GI6S7EK/ref=sr_1_1?s=books&amp;ie=UTF8&amp;qid=1495824966&amp;sr=1-1&amp;keywords=Michael+Lewis%3A+The+Undoing+Project)
+
+???
+
+Story - Trump elections
+
+---
+
+class: center, middle
+
+# Thanks!
+
+Slides created via the R package [**xaringan**](https://github.com/yihui/xaringan).
+
+The chakra comes from [remark.js](https://remarkjs.com), [**knitr**](http://yihui.name/knitr), and [R Markdown](https://rmarkdown.rstudio.com).
+    </textarea>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('showSlide', function (slide) {setTimeout(function() {window.dispatchEvent(new Event('resize'));}, 100)});</script>
+
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  tex2jax: {
+    skipTags: ['script', 'noscript', 'style', 'textarea', 'pre']
+  }
+});
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

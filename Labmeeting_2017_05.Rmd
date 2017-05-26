@@ -1,0 +1,165 @@
+---
+title: "My Last Day at JAX"
+subtitle: "From FASTQ files to QTL Viewer"
+author: "Petr Simecek"
+date: "2017/05/26"
+output:
+  xaringan::moon_reader:
+    lib_dir: libs
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+---
+
+```{r setup, include=FALSE}
+options(htmltools.dir.version = FALSE)
+```
+
+background-image: url(https://c1.staticflickr.com/4/3013/2691957118_93e29ab395_b.jpg)
+
+???
+
+It all started on Mouse Genetics conference...
+
+---
+
+background-image: url(http://www.mousegenetics2011.org/images/mouse_01.png)
+
+???
+
+It all started on Mouse Genetics conference...
+
+---
+
+background-image: url(trump.jpg)
+
+???
+
+Let us strarts from raw data...
+
+---
+
+# Preprocessing (from /data/gac/raw/...)
+
+<tt>/data/cgd/pipeline_emase/scripts</tt>
+
+   - shell script: bowtie + EMASE + GBRS
+   - R script: add annotation, filtering, normalization, rankZ
+   
+```{r, eval=FALSE, include=TRUE}
+
+lods <- function(expr, prob, id, X) {
+  results <- rep(0,ncol(expr))
+  for(i in which(!is.na(id))) {
+    y <- expr[,i] # expression of one gene/protein
+    sel <- !is.na(y)
+    rss1 <- sum(lsfit(y=y[sel], x=cbind(X[sel,],prob[sel,-1,id[i]]), intercept=FALSE)$residuals^2)
+    rss0 <- sum(lsfit(y=y[sel], x=X[sel,], intercept=FALSE)$residuals^2)
+    results[i] <- sum(sel)/2 * (log10(rss0) - log10(rss1))
+  }
+  results
+}
+
+tmp <- lods(expr.mrna, genoprobs, annot.mrna$nearest_snp, covar)
+qgrid <- seq(from=0.50, to=0.95, length=10)
+plot(x=qgrid, y=quantile(tmp, qgrid, na.rm=TRUE), xlab="Quantile", ylab="LOD",
+     type="b", ylim=c(0,100))
+```
+
+
+---
+
+background-image: url(datalake.jpg)
+
+???
+
+So now we have the data
+
+
+---
+
+# Data analysis
+
+<tt>/data/cgd/QTL_mapping</tt>
+
+- ANOVA tests (males vs. females)
+- QTL mapping
+- mediation
+- heritability
+- modules
+
+---
+
+background-image: url(paralel_computing.jpg)
+
+???
+
+So now we have the data
+
+---
+
+# Viewers:
+
+- DOQTL analyses and R/Shiny viewers:
+
+  - [heart](http://churchilldev.jax.org:49194/heart/) 
+  - [kidney](http://churchilldev.jax.org:49194/kidney/) 
+  - [islet](http://churchilldev.jax.org:49194/islet/)
+  - [bones](http://churchilldev.jax.org:49194/bone/)
+  - ...
+  - [others](http://churchill-lab.jax.org/website/shinytools)
+
+- The Aging Proteome [workflowr](http://simecek.xyz/TheAgingProteome/)
+
+???
+
+---
+
+background-image: url(linear_regression.png)
+
+???
+
+Do we believe in our results?
+
+---
+
+# Projects
+
+- Attie DO
+- Pack DO (+ microbiome)
+- Intermediate R package
+- MDA (+paper)
+- CGD DO (kidney, heart liver, bone + phenotypes)
+- qtl2 R package
+- shiny / R API for QTL viewer
+- machine learning (QTL Archive paper)
+
+---
+
+background-image: url(laws_of_physics.png)
+
+???
+
+Do we believe in our results?
+
+---
+
+# Future
+
+- [Nate Silver: The Signal and the Noise: Why So Many Predictions Fail](https://www.amazon.com/Signal-Noise-Many-Predictions-Fail-but/dp/0143125087)
+- [Michael Lewis: The Undoing Project](https://www.amazon.com/Undoing-Project-Friendship-Changed-Minds-ebook/dp/B01GI6S7EK/ref=sr_1_1?s=books&ie=UTF8&qid=1495824966&sr=1-1&keywords=Michael+Lewis%3A+The+Undoing+Project)
+
+???
+
+Story - Trump elections
+
+---
+
+class: center, middle
+
+# Thanks!
+
+Slides created via the R package [**xaringan**](https://github.com/yihui/xaringan).
+
+The chakra comes from [remark.js](https://remarkjs.com), [**knitr**](http://yihui.name/knitr), and [R Markdown](https://rmarkdown.rstudio.com).
